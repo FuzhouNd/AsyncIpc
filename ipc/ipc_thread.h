@@ -5,6 +5,7 @@
 #include <functional>
 #include <queue>
 #include <list>
+#include <limits>
 
 namespace IPC
 {
@@ -12,6 +13,7 @@ namespace IPC
 	{
 	public:
 		typedef std::function<void(void)> Task;
+		//typedef boost::funciton<void(void)> Task;
 
 		struct IOContext;
 
@@ -74,7 +76,7 @@ namespace IPC
 		void DidProcessIOEvent();
 
 		HANDLE thread_;
-		bool should_quit_;
+		volatile bool should_quit_;
 
 		HANDLE io_port_;
 		std::list<IOItem> completed_io_;

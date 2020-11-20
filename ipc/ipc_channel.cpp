@@ -234,16 +234,17 @@ bool Channel::CreatePipe(const IPC::ChannelHandle &channel_handle) {
 	assert(!channel_handle.pipe.handle);
 	pipe_name = PipeName(channel_handle.name, &client_secret_);
 
-	//脧脠鲁垄脢脭麓麓陆篓
+	//先尝试创建
     const DWORD open_mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED |
                             FILE_FLAG_FIRST_PIPE_INSTANCE;
     validate_client_ = !!client_secret_;
-	  BYTE sd[SECURITY_DESCRIPTOR_MIN_LENGTH];
+	//管理员启动权限bug
+	BYTE sd[SECURITY_DESCRIPTOR_MIN_LENGTH];
 	SECURITY_ATTRIBUTES sa;
 
 	sa.nLength = sizeof(sa);
 	sa.bInheritHandle = TRUE;
-	sa.lpSecurityDescriptor = &sd; 
+	sa.lpSecurityDescriptor = &sd;
 
 	InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
 	SetSecurityDescriptorDacl(&sd, TRUE, (PACL)0, FALSE);
@@ -254,7 +255,7 @@ bool Channel::CreatePipe(const IPC::ChannelHandle &channel_handle) {
                              kReadBufferSize,
                              kReadBufferSize,
                              5000,
-                             &sa);
+							 &sa);
 	if (pipe_ == INVALID_HANDLE_VALUE)
 	{
 		pipe_ = CreateFileW(pipe_name.c_str(),

@@ -20,7 +20,16 @@ namespace IPC
 		SetConnected(false);
 		if (channel_) 
 		{
-			HANDLE wait_event = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+			HANDLE wait_event = NULL;
+			if (!name_.empty())
+			{
+				wait_event = ::CreateEventA(NULL, FALSE, FALSE, name_.c_str());
+			}
+			else
+			{
+				wait_event = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+			}
+
 			thread_.PostTask(std::bind(&Endpoint::CloseChannel, this, wait_event));
 			DWORD ret = ::WaitForSingleObject(wait_event, 2000);
 			assert(ret == WAIT_OBJECT_0);

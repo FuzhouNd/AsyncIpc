@@ -1,5 +1,6 @@
 #include "ipc_thread.h"
 #include <cassert>
+#include <deque>
 
 namespace IPC
 {
@@ -68,7 +69,22 @@ namespace IPC
 
 		if (thread_)
 		{
-			::WaitForSingleObject(thread_, 1000);
+			DWORD dwRet = ::WaitForSingleObject(thread_, 1000);
+			auto d = WAIT_OBJECT_0;
+			 
+			if (dwRet == WAIT_OBJECT_0)
+			{
+				//std::cout << L"创建的线程执行结束" << endl;
+			}
+			if (dwRet == WAIT_TIMEOUT)
+			{
+				//cout << "等待超时" << endl;
+			}
+			if (dwRet == WAIT_ABANDONED)
+			{
+				//cout << "Abandoned" << endl;
+			}
+	
 			CloseHandle(thread_);
 			thread_ = NULL;
 		}
@@ -92,10 +108,12 @@ namespace IPC
 	{
 		for (;;) {
 
-			bool more_work_is_plausible = DoScheduledWork();
 
 			if (should_quit_)
 				break;
+
+			bool more_work_is_plausible = DoScheduledWork();
+
 
 			more_work_is_plausible |= WaitForIOCompletion(0, NULL);
 

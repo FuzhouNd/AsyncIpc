@@ -1,6 +1,7 @@
 #include "ipc_utils.h"
 #include <cassert>
 #include <stdlib.h>
+#include <limits>
 
 Lock::Lock()
 {
